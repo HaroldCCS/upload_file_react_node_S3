@@ -1,0 +1,7 @@
+crear archivo back/.env y agregar las siguientes variables: 
+
+//Variables de aws
+accessKeyId=???
+secretAccessKey=???
+region=???
+BUCKET_NAME=???

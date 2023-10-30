@@ -1,4 +1,5 @@
 /back/node_modules
+/back/.env
 /back/package-lock.json
 
 /front/node_modules
