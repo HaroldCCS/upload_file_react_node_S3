@@ -1,30 +1,39 @@
 import React, { useState } from "react";
 import axios from "axios";
+import ProgressBar from "./components/progressBar";
+import RenderFile from "./components/renderFile";
 
 const host = "http://localhost:3002/api";
+const folder_aws_s3 = "test_front";
 
 function App() {
   const [file, setFile] = useState(null);
-
+  const [progressBar, setProgressBar] = useState(0);
+  const [filePathAws, setFilePathAws] = useState("");
+  const [errorMessage, serErrorMessage] = useState("");
 
   const handleFileChange = (e) => {
+    serErrorMessage("");
+    setDefaultStates()
     setFile(e.target.files[0]);
   };
 
+  const setDefaultStates = () => {
+    setFilePathAws("");
+    setProgressBar(0);
+  }
+
+  const failRequest = (error = '') =>{
+    console.log('file error:', error);
+    setDefaultStates()
+    serErrorMessage("Ha ocurrido un error al cargar el archivo, vuelve a intentarlo")
+  }
 
   const handleUpload = async () => {
     if (!file) return;
 
     try {
-      //@INFO Validacion al endpoint antes de cargar el archivo (metadata u logica de negocio)
-      const validateResponse = await fetch(host + "/validate-upload", {
-        method: "POST",
-        // body: formData,
-      });
-      const validateData = await validateResponse.json();
-      if (!validateData.valid) return;
-
-
+      setProgressBar(0.1);
       //@INFO Obteniedo PreSigned de S3 para cargar la imagen desde react
       const uploadResponse = await fetch(host + "/upload", {
         method: "POST",
@@ -32,15 +41,13 @@ function App() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          key: file.name
+          folder: folder_aws_s3,
+          contentType: file.type,
         }),
       });
-      const {data: uploadData} = await uploadResponse.json();
 
-      if (!uploadData.url) {
-        console.log("Upload URL not available");
-        return;
-      }
+      const { data: uploadData, url_download } = await uploadResponse.json();
+      if (!url_download || !uploadData.url) return failRequest();
 
 
       const formData = new FormData();
@@ -49,23 +56,46 @@ function App() {
       });
       formData.append("file", file);
 
+      const axiosConfig = {
+        onUploadProgress: (progressEvent) => {
+          const progress = Math.round(
+            (progressEvent.loaded / progressEvent.total) * 100
+          );
+
+          // Aquí puedes actualizar tu barra de progreso en el frontend
+          setProgressBar(progress);
+        },
+        method: "PUT",
+        headers: { "Content-Type": "multipart/form-data" },
+      };
 
       //@INFO Consumiendo apli de AWS para guardar la imagen
-      await axios.post(uploadData.url, formData, {
-        method: 'PUT',
-        headers: {'Content-Type': 'multipart/form-data'},
-      });
+      await axios.post(uploadData.url, formData, axiosConfig);
+      setFilePathAws(url_download);
     } catch (error) {
-      console.error("Error uploading file:", error);
+      return failRequest(error)
     }
   };
 
-
   return (
-    <div>
+    <>
       <input type="file" onChange={handleFileChange} />
-      <button onClick={handleUpload}>Upload</button>
-    </div>
+      {!!file && progressBar === 0 && (
+        <button onClick={handleUpload}>Upload</button>
+      )}
+      <br />
+
+      {!!errorMessage && <p>{errorMessage}</p>}
+      {!!progressBar && <ProgressBar progress={progressBar} />}
+      {!!filePathAws && (
+        <a href={filePathAws} target="_blank" rel="noopener noreferrer">
+          abrir archivo
+        </a>
+      )}
+
+      <br />
+      <RenderFile file={file} />
+    </>
   );
 }
 
