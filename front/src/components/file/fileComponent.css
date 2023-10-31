@@ -1,0 +1,63 @@
+.file-card {
+  border: 1px solid #ccc;
+  padding: 20px;
+  margin: 10px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+  max-width: 200px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.general-button {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.open-button {
+  background-color: #2124c8;
+  color: white;
+}
+
+.upload-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.delete-button {
+  background-color: #cd2121;
+  color: white;
+}
+
+.upload-button:hover {
+  background-color: #45a049;
+}
+
+.error-message {
+  color: #ff0000;
+}
+
+.open-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.open-link:hover {
+  text-decoration: underline;
+  color: #0056b3;
+}
+
+.file-card img, iframe, video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Puedes ajustar esto según tus preferencias */
+}

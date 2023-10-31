@@ -7,11 +7,11 @@ const RenderFile = ({ file }) => {
       {file && (
         <div>
           {file.type.startsWith('image/') && (
-            <img src={URL.createObjectURL(file)} alt="Contenido seleccionado" style={{ maxWidth: '100%' }} />
+            <img src={URL.createObjectURL(file)} alt="Contenido seleccionado"  />
           )}
 
           {file.type.startsWith('video/') && (
-            <video width="320" height="240" controls>
+            <video width="auto" height="auto" controls>
               <source src={URL.createObjectURL(file)} type={file.type} />
               Tu navegador no soporta el elemento de video.
             </video>
