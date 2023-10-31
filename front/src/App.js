@@ -7,9 +7,6 @@ function App() {
   const fileInputRef = useRef(null);
 
   const handleFileChange = (e) => {
-    console.warn('-----')
-    console.log('files', files);
-    console.log('e.target.files', e.target.files);
     setFiles((prevFiles) => {
       const newFiles = Array.from(e.target.files);
 
